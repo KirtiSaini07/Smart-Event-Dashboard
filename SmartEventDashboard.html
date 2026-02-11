@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Event Dashbaord</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4379ae, #000000);
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .main-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 20px #8dc6ff;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #5a6cff;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .add-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #5a6cff, #55c2ff);
+            color: white;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .actions button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #5a6cff, #55c2ff);
+            color: white;
+            cursor: pointer;
+        }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .event-card {
+            background: #b6ceffe2;
+            padding: 15px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .event-card h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #5a6cff;
+            color: white;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin: 5px 0;
+        }
+
+        .del-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff5c5c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        .dom-card {
+            grid-column: span 2;
+        }
+
+        .output {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .highlight {
+            border: 2px solid #5a6cff;
+        }
+    </style>
+</head>
+
+<body>
+    <header>🎯 Smart Event Dashboard</header>
+    <div class="main-wrapper">
+
+        <!-- LEFT -->
+        <div class="card">
+            <h3>Add New Event</h3>
+
+            <form action="">
+                <label for="eventTitle">Event Title :</label>
+                <input type="text" name="" id="eventTitle">
+
+                <label for="eventDate">Event Date :</label>
+                <input type="date" name="" id="eventDate">
+
+                <label for="eventCategory">Event Category :</label>
+                <select name="" id="eventCategory">
+                    <option value="Conference">Conference</option>
+                    <option value="Webinar">Webinar</option>
+                    <option value="Meetup">Meetup</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Social">Social</option>
+                </select>
+
+                <label for="eventDescription">Event Description :</label>
+                <textarea name="" id="eventDescription" rows="3"></textarea>
+
+                <button class="add-btn" type="submit" id="">Add Event</button>
+            </form>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="card">
+            <h3>My Events</h3>
+
+            <div class="actions">
+                <button id="clearBtn">Clear All Events</button>
+                <button id="sampleBtn">Add Sample Events</button>
+            </div>
+
+            <div class="event-grid" id="eventContainer">
+                <h4>No Events Yet</h4>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM -->
+        <div class="card dom-card">
+            <h3>DOM Manipulation Demo</h3>
+            <div class="output" id="output">You Pressed: None</div>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        let form = document.querySelector("form");
+        let eventTitle = document.querySelector("#eventTitle");
+        let eventDate = document.querySelector("#eventDate");
+        let eventCategory = document.querySelector("#eventCategory");
+        let eventDescription = document.querySelector("#eventDescription");
+        let eventContainer = document.querySelector("#eventContainer");
+        let clearBtn = document.querySelector("#clearBtn");
+        let sampleBtn = document.querySelector("#sampleBtn");
+
+        let isEmpty = true;
+
+        // Form Submission
+        function addEventFunction(event) {
+            event.preventDefault();
+            let card = document.createElement("div");
+            card.className = "event-card";
+            card.innerHTML = `<button class="del-btn">X</button>
+                            <h4>${eventTitle.value}</h4>
+                            <span>${eventDate.value}</span><br>
+                            <span>${eventCategory.value}</span><br>
+                            <p>${eventDescription.value}</p>`;
+
+            if (isEmpty) {
+                eventContainer.innerHTML = "";
+                isEmpty = false;
+            }
+            eventContainer.appendChild(card);
+            form.reset();
+
+        }
+        form.addEventListener("submit", addEventFunction)
+
+        // Handle delete + highlight (Event Delegation)
+        function handleCardClick(event) {
+
+            // Delete button
+            if (event.target.classList.contains("del-btn")) {
+                event.target.parentElement.remove();
+                return;
+            }
+
+            // Highlight card
+            const card = event.target.closest(".event-card");
+            if (card) {
+                card.classList.toggle("highlight");
+            }
+        }
+        eventContainer.addEventListener("click", handleCardClick);
+
+
+
+        // Clear all events
+        function clearAllEvents() {
+            eventContainer.innerHTML = "<h4>No Events Yet</h4>";
+            isEmpty = true;
+        }
+        clearBtn.addEventListener("click", clearAllEvents);
+
+        // Add sample event
+        function addSampleEvent() {
+            if (isEmpty) {
+                eventContainer.innerHTML = "";
+                isEmpty = false;
+            }
+
+            let sample = document.createElement("div");
+            sample.className = "event-card";
+            sample.innerHTML = `<button class="del-btn">X</button>
+                                <h4>AI & Data Science Conference</h4>
+                                <span>2026-03-01</span><br>
+                                <span>Conference</span><br>
+                                <p>Industry experts discussing latest trends in AI and Machine Learning.</p>`;
+            eventContainer.appendChild(sample);
+        }
+        sampleBtn.addEventListener("click", addSampleEvent);
+
+        // DOM Manipulation
+        let output = document.getElementById("output");
+
+        function showKeyPressed(event) {
+            output.innerText = "You Pressed: " + event.key;
+        }
+
+        document.addEventListener("keydown", showKeyPressed);
+
+
+    </script>
+
+</body>
+
+</html>
