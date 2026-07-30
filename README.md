@@ -34,3 +34,8 @@ The Smart Event Dashboard is a web-based application that allows users to add, m
 
 ## 🎓 Purpose
 This project was created as part of a Web Development lab assignment to demonstrate understanding of DOM manipulation and event handling in JavaScript.
+
+---
+
+## 🌐 Live Demo
+https://smarteventtdashboard.netlify.app/
